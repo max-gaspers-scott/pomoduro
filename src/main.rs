@@ -17,9 +17,9 @@ fn main() {
     }
     let seconts = minuts
         .trim()
-        .parse::<f32>()
+        .parse::<u64>()
         .expect("that was not a valid u64 number")
-        * 60.0;
+        * 60;
 
     let start = SystemTime::now();
     let (tx, rx) = channel::<()>();
@@ -31,7 +31,7 @@ fn main() {
         let _ = tx.send(());
     });
 
-    let mut duration = 0.0;
+    let mut duration = 0;
     loop {
         print!("{}[2J{}[1;1H", 27 as char, 27 as char);
 
@@ -39,11 +39,11 @@ fn main() {
         duration = now
             .duration_since(start)
             .expect("error getting duration_since")
-            .as_secs() as f32;
+            .as_secs();
 
         let seconts_left = seconts - duration;
-        let display_minust = seconts_left / 60.0;
-        let display_seconts = seconts_left % 60.0;
+        let display_minust = seconts_left / 60;
+        let display_seconts = seconts_left % 60;
         println!("minuts: {}, seconts: {}", display_minust, display_seconts);
 
         match rx.recv_timeout(Duration::from_secs(1)) {
@@ -59,7 +59,7 @@ fn main() {
                 break;
             }
         }
-        if seconts_left == 0.0 {
+        if seconts_left == 0 {
             let handle =
                 rodio::DeviceSinkBuilder::open_default_sink().expect("open default audio stream");
             let player = rodio::Player::connect_new(&handle.mixer());
@@ -75,7 +75,7 @@ fn main() {
             // so we need to keep the main thread hile it's playing.
             std::thread::sleep(std::time::Duration::from_secs(3));
         }
-        if seconts_left % 60.0 == 0.0 && seconts_left != 0.0 {
+        if seconts_left % 60 * 5 == 0 && seconts_left != 0 {
             let handle =
                 rodio::DeviceSinkBuilder::open_default_sink().expect("open default audio stream");
             let player = rodio::Player::connect_new(&handle.mixer());
