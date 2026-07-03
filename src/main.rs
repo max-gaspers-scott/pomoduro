@@ -15,11 +15,13 @@ fn main() {
             println!("error: {e}")
         }
     }
-    let seconts = minuts
-        .trim()
-        .parse::<u64>()
-        .expect("that was not a valid u64 number")
-        * 60;
+    let seconts = 3;
+
+    // = minuts
+    //     .trim()
+    //     .parse::<u64>()
+    //     .expect("that was not a valid u64 number")
+    //     * 60;
 
     let start = SystemTime::now();
     let (tx, rx) = channel::<()>();
@@ -49,6 +51,7 @@ fn main() {
         match rx.recv_timeout(Duration::from_secs(1)) {
             Ok(_) => {
                 println!("\nStopped early by user!");
+                println!("worked for: {display_minust}:{display_seconts}");
                 break;
             }
             Err(std::sync::mpsc::RecvTimeoutError::Timeout) => {
@@ -56,6 +59,7 @@ fn main() {
             }
             Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => {
                 // The input thread disconnected/panicked, break
+                println!("worked for: {display_minust}:{display_seconts}");
                 break;
             }
         }
@@ -69,11 +73,15 @@ fn main() {
             let source = Decoder::try_from(file).unwrap();
             // Play the sound directly on the device
             handle.mixer().add(source);
+            // does not work
             Command::new("wall").args(["Work time done"]);
 
             // The sound plays in a separate audio thread,
             // so we need to keep the main thread hile it's playing.
             std::thread::sleep(std::time::Duration::from_secs(3));
+
+            println!("worked for: {display_minust}:{display_seconts}");
+            break;
         }
         if seconts_left % 60 * 5 == 0 && seconts_left != 0 {
             let handle =
@@ -84,6 +92,18 @@ fn main() {
             handle.mixer().add(source);
             std::thread::sleep(std::time::Duration::from_secs(3));
         }
-        println!("worked for: {display_minust}:{display_seconts}");
+    }
+    // rx
+    println!("what did you learn");
+    let mut learn = String::new();
+
+    learn = learn.trim().to_string();
+    match std::io::stdin().read_line(&mut learn) {
+        Ok(_) => {
+            println!("learned: {learn}");
+        }
+        Err(e) => {
+            println!("error: {e}")
+        }
     }
 }
