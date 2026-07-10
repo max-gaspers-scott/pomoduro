@@ -7,6 +7,8 @@ use std::thread;
 use std::time::Duration;
 use std::time::{SystemTime, UNIX_EPOCH};
 fn main() {
+    println!("use this commad to record your work  ");
+    println!("asciinema record 7-9_6pm.cast ");
     println!("how may munuts do you want to work");
     let mut minuts = String::new();
     match std::io::stdin().read_line(&mut minuts) {
