@@ -15,17 +15,17 @@ fn main() {
             println!("error: {e}")
         }
     }
-    let seconts = 3;
+    // let seconts = 3;
 
-    // = minuts
-    //     .trim()
-    //     .parse::<u64>()
-    //     .expect("that was not a valid u64 number")
-    //     * 60;
+    let seconts = minuts
+        .trim()
+        .parse::<i32>()
+        .expect("that was not a valid u64 number")
+        * 1; // change back to 60
 
     let start = SystemTime::now();
     let (tx, rx) = channel::<()>();
-    std::thread::spawn(move || {
+    let join_handel = std::thread::spawn(move || {
         let mut input = String::new();
         // This blocks the background thread until the user presses Enter
         let _ = std::io::stdin().read_line(&mut input);
@@ -33,7 +33,7 @@ fn main() {
         let _ = tx.send(());
     });
 
-    let mut duration = 0;
+    let mut duration: i32 = 0;
     loop {
         print!("{}[2J{}[1;1H", 27 as char, 27 as char);
 
@@ -41,7 +41,9 @@ fn main() {
         duration = now
             .duration_since(start)
             .expect("error getting duration_since")
-            .as_secs();
+            .as_secs()
+            .try_into()
+            .unwrap();
 
         let seconts_left = seconts - duration;
         let display_minust = seconts_left / 60;
@@ -74,14 +76,13 @@ fn main() {
             // Play the sound directly on the device
             handle.mixer().add(source);
             // does not work
-            Command::new("wall").args(["Work time done"]);
+            // Command::new("wall").args(["Work time done"]);
 
             // The sound plays in a separate audio thread,
             // so we need to keep the main thread hile it's playing.
             std::thread::sleep(std::time::Duration::from_secs(3));
 
             println!("worked for: {display_minust}:{display_seconts}");
-            break;
         }
         if seconts_left % 60 * 5 == 0 && seconts_left != 0 {
             let handle =
