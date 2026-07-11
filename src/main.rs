@@ -1,4 +1,5 @@
 use rodio::{Decoder, MixerDeviceSink, source::Source};
+
 use std::fs::File;
 use std::process::Command;
 use std::sync::mpsc::{Receiver, channel};
@@ -17,13 +18,12 @@ fn main() {
             println!("error: {e}")
         }
     }
-    // let seconts = 3;
 
     let seconts = minuts
         .trim()
         .parse::<i32>()
         .expect("that was not a valid u64 number")
-        * 1; // change back to 60
+        * 60;
 
     let start = SystemTime::now();
     let (tx, rx) = channel::<()>();
@@ -109,4 +109,15 @@ fn main() {
             println!("error: {e}")
         }
     }
+
+    use std::fs::OpenOptions;
+    use std::io::Write;
+    let mut file = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open("learned.txt")
+        .unwrap();
+
+    file.write_all(learn.as_bytes()).unwrap();
+    file.flush().unwrap();
 }

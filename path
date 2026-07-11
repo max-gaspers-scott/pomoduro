@@ -1,0 +1,2 @@
+c
+that you need to import std::io::Write to write to files, its a trate needed in scode for File.write_all to work, even though you dont call Write. the trate just needs to be in scope
