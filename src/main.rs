@@ -1,4 +1,5 @@
 use rodio::{Decoder, MixerDeviceSink, source::Source};
+
 use std::fs::File;
 use std::process::Command;
 use std::sync::mpsc::{Receiver, channel};
@@ -7,6 +8,8 @@ use std::thread;
 use std::time::Duration;
 use std::time::{SystemTime, UNIX_EPOCH};
 fn main() {
+    println!("use this commad to record your work  ");
+    println!("asciinema record 7-9_6pm.cast ");
     println!("how may munuts do you want to work");
     let mut minuts = String::new();
     match std::io::stdin().read_line(&mut minuts) {
@@ -15,17 +18,16 @@ fn main() {
             println!("error: {e}")
         }
     }
-    let seconts = 3;
 
-    // = minuts
-    //     .trim()
-    //     .parse::<u64>()
-    //     .expect("that was not a valid u64 number")
-    //     * 60;
+    let seconts = minuts
+        .trim()
+        .parse::<i32>()
+        .expect("that was not a valid u64 number")
+        * 60;
 
     let start = SystemTime::now();
     let (tx, rx) = channel::<()>();
-    std::thread::spawn(move || {
+    let join_handel = std::thread::spawn(move || {
         let mut input = String::new();
         // This blocks the background thread until the user presses Enter
         let _ = std::io::stdin().read_line(&mut input);
@@ -33,7 +35,7 @@ fn main() {
         let _ = tx.send(());
     });
 
-    let mut duration = 0;
+    let mut duration: i32 = 0;
     loop {
         print!("{}[2J{}[1;1H", 27 as char, 27 as char);
 
@@ -41,7 +43,9 @@ fn main() {
         duration = now
             .duration_since(start)
             .expect("error getting duration_since")
-            .as_secs();
+            .as_secs()
+            .try_into()
+            .unwrap();
 
         let seconts_left = seconts - duration;
         let display_minust = seconts_left / 60;
@@ -74,14 +78,13 @@ fn main() {
             // Play the sound directly on the device
             handle.mixer().add(source);
             // does not work
-            Command::new("wall").args(["Work time done"]);
+            // Command::new("wall").args(["Work time done"]);
 
             // The sound plays in a separate audio thread,
             // so we need to keep the main thread hile it's playing.
             std::thread::sleep(std::time::Duration::from_secs(3));
 
             println!("worked for: {display_minust}:{display_seconts}");
-            break;
         }
         if seconts_left % 60 * 5 == 0 && seconts_left != 0 {
             let handle =
@@ -106,4 +109,15 @@ fn main() {
             println!("error: {e}")
         }
     }
+
+    use std::fs::OpenOptions;
+    use std::io::Write;
+    let mut file = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open("learned.txt")
+        .unwrap();
+
+    file.write_all(learn.as_bytes()).unwrap();
+    file.flush().unwrap();
 }
