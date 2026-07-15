@@ -1,0 +1,1 @@
+when getting json res from request client, you need to type anotat with struct you make
