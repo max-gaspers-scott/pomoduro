@@ -1,7 +1,19 @@
 [package]
-name = "pomoduro"
+name = "pomodoro"
 version = "0.1.0"
 edition = "2024"
+
+authors = ["Max Gaspers Scott gaspersscottma@gmail.com"]
+description = "A pomodoro timer for programmers"
+license = "Apache-2.0"
+
+readme = "README.md"
+homepage = "https://github.com/max-gaspers-scott/pomoduro"
+repository = "https://github.com/max-gaspers-scott/pomoduro"
+documentation = "https://docs.rs/my_awesome_crate"
+
+keywords = ["utility", "cli"]
+categories = ["command-line-utilities", "development-tools::cargo-plugins"]
 
 [dependencies]
 rodio = "0.22.2"
