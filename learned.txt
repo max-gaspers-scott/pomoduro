@@ -32,3 +32,9 @@ testing is good
 <task>testing pomodruo</tesk>
 <startTime>SystemTime { tv_sec: 1784309840, tv_nsec: 395838795 }</startTime>
 <learned>that the order of stuff matters</learned>
+<task>task3</tesk>
+<startTime>SystemTime { tv_sec: 1784310277, tv_nsec: 456931792 }</startTime>
+<learned>stuff3</learned>
+<task>1</task>
+<start-time>SystemTime { tv_sec: 1784310478, tv_nsec: 294019044 }</start-time>
+<learned>1</learned>
