@@ -1,6 +1,9 @@
 use rodio::{Decoder, MixerDeviceSink, source::Source};
+use std::fs::OpenOptions;
+use std::io::Write;
 
-use std::fs::File;
+use std::fmt::format;
+use std::fs::{File, Metadata};
 use std::process::Command;
 use std::sync::mpsc::{Receiver, channel};
 use std::thread;
@@ -10,6 +13,17 @@ use std::time::{SystemTime, UNIX_EPOCH};
 fn main() {
     println!("use this commad to record your work  ");
     println!("asciinema record 7-9_6pm.cast ");
+
+    println!("what are you going to work on");
+    let mut task = String::new();
+    match std::io::stdin().read_line(&mut task) {
+        Ok(_) => {}
+        Err(e) => {
+            println!("error: {e}")
+        }
+    }
+    write("task", &task);
+
     println!("how may munuts do you want to work");
     let mut minuts = String::new();
     match std::io::stdin().read_line(&mut minuts) {
@@ -26,6 +40,9 @@ fn main() {
         * 60;
 
     let start = SystemTime::now();
+    let start_str = format!("{:?}", start);
+
+    write("start-time", &start_str);
     let (tx, rx) = channel::<()>();
     let join_handel = std::thread::spawn(move || {
         let mut input = String::new();
@@ -99,8 +116,6 @@ fn main() {
     // rx
     println!("what did you learn");
     let mut learn = String::new();
-
-    learn = learn.trim().to_string();
     match std::io::stdin().read_line(&mut learn) {
         Ok(_) => {
             println!("learned: {learn}");
@@ -109,15 +124,19 @@ fn main() {
             println!("error: {e}")
         }
     }
+    write("learned", &learn);
+}
 
-    use std::fs::OpenOptions;
-    use std::io::Write;
+fn write(meta_str: &str, text: &str) {
+    let text = text.trim();
+    let text = format!("<{}>{}</{}>\n", meta_str, text, meta_str);
+
     let mut file = OpenOptions::new()
         .create(true)
         .append(true)
         .open("learned.txt")
         .unwrap();
 
-    file.write_all(learn.as_bytes()).unwrap();
+    file.write_all(text.as_bytes()).unwrap();
     file.flush().unwrap();
 }
