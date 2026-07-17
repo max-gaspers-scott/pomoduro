@@ -1,5 +1,6 @@
 use rodio::{Decoder, MixerDeviceSink, source::Source};
 
+use std::fmt::format;
 use std::fs::File;
 use std::process::Command;
 use std::sync::mpsc::{Receiver, channel};
@@ -10,6 +11,24 @@ use std::time::{SystemTime, UNIX_EPOCH};
 fn main() {
     println!("use this commad to record your work  ");
     println!("asciinema record 7-9_6pm.cast ");
+
+    println!("what are you going to work on");
+    let mut task = String::new();
+    match std::io::stdin().read_line(&mut task) {
+        Ok(_) => {}
+        Err(e) => {
+            println!("error: {e}")
+        }
+    }
+    let mut file = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open("learned.txt")
+        .unwrap();
+
+    let task = format!("<task>{}</tesk>\n", task.trim());
+    file.write_all(task.as_bytes()).unwrap();
+    file.flush().unwrap();
     println!("how may munuts do you want to work");
     let mut minuts = String::new();
     match std::io::stdin().read_line(&mut minuts) {
@@ -26,6 +45,15 @@ fn main() {
         * 60;
 
     let start = SystemTime::now();
+
+    let start_stirng = format!("<startTime>{:?}</startTime>\n", start);
+    file.write_all(start_stirng.as_bytes()).unwrap();
+    let mut file = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open("learned.txt")
+        .unwrap();
+
     let (tx, rx) = channel::<()>();
     let join_handel = std::thread::spawn(move || {
         let mut input = String::new();
@@ -99,8 +127,6 @@ fn main() {
     // rx
     println!("what did you learn");
     let mut learn = String::new();
-
-    learn = learn.trim().to_string();
     match std::io::stdin().read_line(&mut learn) {
         Ok(_) => {
             println!("learned: {learn}");
@@ -110,6 +136,7 @@ fn main() {
         }
     }
 
+    learn = format!("<learned>{}</learned>\n", learn.trim());
     use std::fs::OpenOptions;
     use std::io::Write;
     let mut file = OpenOptions::new()
