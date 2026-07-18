@@ -1,6 +1,8 @@
 use rodio::{Decoder, MixerDeviceSink, source::Source};
+
 use std::fs::OpenOptions;
 use std::io::Write;
+use time::OffsetDateTime; // Make sure to bring in format_description
 
 use std::fmt::format;
 use std::fs::{File, Metadata};
@@ -11,17 +13,11 @@ use std::thread;
 use std::time::Duration;
 use std::time::{SystemTime, UNIX_EPOCH};
 fn main() {
+    spaceing();
     println!("use this commad to record your work  ");
     println!("asciinema record 7-9_6pm.cast ");
+    let task = get_input("what are you going to work on");
 
-    println!("what are you going to work on");
-    let mut task = String::new();
-    match std::io::stdin().read_line(&mut task) {
-        Ok(_) => {}
-        Err(e) => {
-            println!("error: {e}")
-        }
-    }
     write("task", &task);
 
     println!("how may munuts do you want to work");
@@ -41,8 +37,8 @@ fn main() {
 
     let start = SystemTime::now();
     let start_str = format!("{:?}", start);
-
-    write("start-time", &start_str);
+    let now_local: OffsetDateTime = OffsetDateTime::now_utc();
+    write("start-time", &now_local.to_string());
     let (tx, rx) = channel::<()>();
     let join_handel = std::thread::spawn(move || {
         let mut input = String::new();
@@ -114,22 +110,26 @@ fn main() {
         }
     }
     // rx
-    println!("what did you learn");
-    let mut learn = String::new();
-    match std::io::stdin().read_line(&mut learn) {
-        Ok(_) => {
-            println!("learned: {learn}");
-        }
+    let learn = get_input("what did you learn");
+
+    write("learned", &learn);
+}
+
+fn get_input(msg: &str) -> String {
+    println!("{msg}");
+    let mut input = String::new();
+    match std::io::stdin().read_line(&mut input) {
+        Ok(_) => input,
         Err(e) => {
-            println!("error: {e}")
+            println!("error getting input: {e}");
+            get_input(msg)
         }
     }
-    write("learned", &learn);
 }
 
 fn write(meta_str: &str, text: &str) {
     let text = text.trim();
-    let text = format!("<{}>{}</{}>\n", meta_str, text, meta_str);
+    let text = format!("{}: {}\n", meta_str, text);
 
     let mut file = OpenOptions::new()
         .create(true)
@@ -138,5 +138,16 @@ fn write(meta_str: &str, text: &str) {
         .unwrap();
 
     file.write_all(text.as_bytes()).unwrap();
+    file.flush().unwrap();
+}
+
+fn spaceing() {
+    let mut file = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open("learned.txt")
+        .unwrap();
+
+    file.write_all("\n\n".as_bytes()).unwrap();
     file.flush().unwrap();
 }
