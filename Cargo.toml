@@ -17,3 +17,4 @@ categories = ["command-line-utilities", "development-tools::cargo-plugins"]
 
 [dependencies]
 rodio = "0.22.2"
+time = "0.3.53"
