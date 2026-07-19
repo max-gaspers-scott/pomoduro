@@ -1,5 +1,6 @@
 use rodio::{Decoder, MixerDeviceSink, source::Source};
 
+use std::ffi::os_str::Display;
 use std::fs::OpenOptions;
 use std::io::Write;
 use time::OffsetDateTime; // Make sure to bring in format_description
@@ -61,14 +62,24 @@ fn main() {
             .unwrap();
 
         let seconts_left = seconts - duration;
-        let display_minust = seconts_left / 60;
+        let display_minuts = seconts_left / 60;
         let display_seconts = seconts_left % 60;
-        println!("minuts: {}, seconts: {}", display_minust, display_seconts);
+        let display_minuts = format!("{:>6b}", display_minuts);
+        let first_half = format!("{:0>3}", &display_minuts[0..3]);
+        println!("{first_half}");
+        let secont_falf = &display_minuts[3..];
+        println!("{secont_falf}");
+        let display_minuts = format!("{}-{}", first_half, secont_falf);
+
+        println!(
+            "minuts: {}, seconts: {:0>6b}",
+            display_minuts, display_seconts
+        );
 
         match rx.recv_timeout(Duration::from_secs(1)) {
             Ok(_) => {
                 println!("\nStopped early by user!");
-                println!("worked for: {display_minust}:{display_seconts}");
+                println!("worked for: {display_minuts}:{display_seconts}");
                 break;
             }
             Err(std::sync::mpsc::RecvTimeoutError::Timeout) => {
@@ -76,7 +87,7 @@ fn main() {
             }
             Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => {
                 // The input thread disconnected/panicked, break
-                println!("worked for: {display_minust}:{display_seconts}");
+                println!("worked for: {display_minuts}:{display_seconts}");
                 break;
             }
         }
@@ -97,7 +108,7 @@ fn main() {
             // so we need to keep the main thread hile it's playing.
             std::thread::sleep(std::time::Duration::from_secs(3));
 
-            println!("worked for: {display_minust}:{display_seconts}");
+            println!("worked for: {display_minuts}:{display_seconts}");
         }
         if seconts_left % 60 * 5 == 0 && seconts_left != 0 {
             let handle =
@@ -150,4 +161,16 @@ fn spaceing() {
 
     file.write_all("\n\n".as_bytes()).unwrap();
     file.flush().unwrap();
+}
+fn to_binary_str(mut num: i32) -> String {
+    let mut vecter: Vec<i32> = vec![];
+
+    while num > 0 {
+        let end = num % 10;
+        num = num / 10;
+        vecter.push(end);
+    }
+
+    // let string_chees = end.parse::<String>().expect("not a number");
+    format!("{:?}", vecter)
 }
