@@ -1,5 +1,6 @@
 use rodio::{Decoder, MixerDeviceSink, source::Source};
 
+use std::char::CharTryFromError;
 use std::ffi::os_str::Display;
 use std::fs::OpenOptions;
 use std::io::Write;
@@ -14,6 +15,9 @@ use std::thread;
 use std::time::Duration;
 use std::time::{SystemTime, UNIX_EPOCH};
 fn main() {
+    println!("\x1B[41mThis has a red background!\x1B[0m");
+
+    println!("\\e[41m\\e[97m Red Background \\e[0m");
     spaceing();
     println!("use this commad to record your work  ");
     println!("asciinema record 7-9_6pm.cast ");
@@ -64,18 +68,21 @@ fn main() {
         let seconts_left = seconts - duration;
         let display_minuts = seconts_left / 60;
         let display_seconts = seconts_left % 60;
-        let display_minuts = format!("{:>6b}", display_minuts);
-        let first_half = format!("{:0>3}", &display_minuts[0..3]);
-        println!("{first_half}");
-        let secont_falf = &display_minuts[3..];
-        println!("{secont_falf}");
-        let display_minuts = format!("{}-{}", first_half, secont_falf);
-
+        // print!("minuts: ");
+        // print_color(&to_binary_str(display_minuts));
+        // print!(", seconts: ");
+        // print_color(&to_binary_str(display_seconts));
+        // println!("");
+        //
         println!(
-            "minuts: {}, seconts: {:0>6b}",
-            display_minuts, display_seconts
+            "minuts: {}, seconts: {}",
+            to_binary_str(display_minuts),
+            to_binary_str(display_seconts)
         );
-
+        // println!("                              ___________");
+        println!("                                6 318 421");
+        println!("                                4 26     ");
+        println!();
         match rx.recv_timeout(Duration::from_secs(1)) {
             Ok(_) => {
                 println!("\nStopped early by user!");
@@ -162,15 +169,26 @@ fn spaceing() {
     file.write_all("\n\n".as_bytes()).unwrap();
     file.flush().unwrap();
 }
+
 fn to_binary_str(mut num: i32) -> String {
-    let mut vecter: Vec<i32> = vec![];
+    let mut displayibl = format!("{:0>9b}", num);
+    displayibl.insert_str(3, "-");
+    displayibl.insert_str(7, "-");
+    displayibl
+}
 
-    while num > 0 {
-        let end = num % 10;
-        num = num / 10;
-        vecter.push(end);
+fn print_color(input: &str) {
+    let mut is_odd = false;
+    for ch in input.chars() {
+        if ch.eq(&'-') {
+            print!("-");
+            continue;
+        }
+        if is_odd {
+            print!("{ch}");
+        } else {
+            print!("\x1B[21m{ch}\x1B[0m")
+        }
+        is_odd = !is_odd;
     }
-
-    // let string_chees = end.parse::<String>().expect("not a number");
-    format!("{:?}", vecter)
 }
