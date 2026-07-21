@@ -1,3 +1,12 @@
+//! this is a pomodoro timer for intense work
+//! no relaxed lofi
+//!
+//! to install:
+//! cargo install intense-pomodor
+//!
+//! to run:
+//! intense-pomodor
+
 use rodio::{Decoder, MixerDeviceSink, source::Source};
 
 use std::char::CharTryFromError;
@@ -14,6 +23,7 @@ use std::thread;
 
 use std::time::Duration;
 use std::time::{SystemTime, UNIX_EPOCH};
+
 fn main() {
     println!("\x1B[41mThis has a red background!\x1B[0m");
 
