@@ -1,6 +1,6 @@
 [package]
 name = "intense-pomodoro"
-version = "0.1.0"
+version = "0.1.2"
 edition = "2024"
 
 authors = ["Max Gaspers Scott gaspersscottma@gmail.com"]
@@ -14,6 +14,7 @@ documentation = "https://docs.rs/my_awesome_crate"
 
 keywords = ["utility", "cli"]
 categories = ["command-line-utilities", "development-tools::cargo-plugins"]
+[package.metadata.docs.rs]
 
 [dependencies]
 rodio = "0.22.2"
