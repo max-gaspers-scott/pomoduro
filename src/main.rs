@@ -65,6 +65,7 @@ fn main() {
 
     let mut duration: i32 = 0;
     loop {
+    loop {
         print!("{}[2J{}[1;1H", 27 as char, 27 as char);
 
         let now = SystemTime::now();
@@ -141,6 +142,12 @@ fn main() {
     let learn = get_input("what did you learn");
 
     write("learned", &learn);
+    let continue= get_input("another work sessio? N to stop, any key to continue");
+    if continue== "N" {
+        break;
+    }
+    }
+    
 }
 
 fn get_input(msg: &str) -> String {
