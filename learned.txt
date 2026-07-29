@@ -1,7 +1,0 @@
-when getting json res from request client, you need to type anotat with struct you make
-when pushing a crate to crates io, code that writes to disk gets messed up
-trais are complicated 
-if you have two impimentaions of a trait, and an enum of each struct that impliments the trate, you can just call a method on the enum 
-a funciton that returns a valu, that isent saved with let creates a temprary value that is droped at the end of scope. you can call anohter method on this temprary value by chaing more methods on the end. but if you try to return this at the end of the block the outer scop will be pointing to data  thats been freed. so fix by usieng `let var = ` outsid the block and callend funciton on var. so dont { mystruct.funky }, insted use let var = mystruct; let new = { \...\ var.funky(\...\) }
-flatten takes struct and makes it not nessted whwen its turned into json, getting rid of the struct title. struct with. should realy jsut find a way to easly add structs, then use that flexiblity to add whatever you want as json. no need for jsons felxibiltiy
-
