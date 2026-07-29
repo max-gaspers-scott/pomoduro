@@ -8,6 +8,7 @@
 //! intense-pomodor
 
 use rodio::{Decoder, MixerDeviceSink, source::Source};
+use std::path::PathBuf;
 
 use std::char::CharTryFromError;
 use std::ffi::os_str::Display;
@@ -166,14 +167,26 @@ fn write(meta_str: &str, text: &str) {
     let text = text.trim();
     let text = format!("{}: {}\n", meta_str, text);
 
+    let path = get_learned_file_path().unwrap();
     let mut file = OpenOptions::new()
         .create(true)
         .append(true)
-        .open("learned.txt")
+        .open(path)
         .unwrap();
 
     file.write_all(text.as_bytes()).unwrap();
     file.flush().unwrap();
+}
+
+fn get_learned_file_path() -> Option<PathBuf> {
+    // Uses standard OS data dirs (e.g., ~/.local/share/your-crate-name/learned.txt on Linux)
+    let mut path = directories::ProjectDirs::from("com", "MaxGaspersScott", "intense-pomodor")?
+        .data_dir()
+        .to_path_buf();
+
+    std::fs::create_dir_all(&path).ok()?;
+    path.push("learned.txt");
+    Some(path)
 }
 
 fn spaceing() {
