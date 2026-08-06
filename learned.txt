@@ -1,0 +1,9 @@
+learned: when you install crate with cargo install, path are written relitive to .cargo. your applicaion should use dirs crate to create a path to app data such as ~/local/crate-name/file.xxx
+
+
+
+
+
+
+
+

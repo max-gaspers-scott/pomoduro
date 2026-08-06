@@ -24,10 +24,56 @@ use std::thread;
 
 use std::time::Duration;
 use std::time::{SystemTime, UNIX_EPOCH};
+// make fsa
+enum States {
+    working,    // get into and start clock
+    break_time, // get info and start break
+}
+
+enum Acction {
+    goto_working,
+    goto_break,
+}
+
+struct Window {
+    state: States,
+}
+
+impl Window {
+    // working can go to working for break
+    // break can only go to working
+    fn chang_state(&mut self, acction: Acction) {
+        match (&self.state, acction) {
+            (States::working, Acction::goto_working) => {
+                self.state = States::working;
+            }
+            (States::working, Acction::goto_break) => {
+                self.state = States::break_time;
+            }
+            (States::break_time, _) => self.state = States::working,
+        }
+    }
+    fn run(&mut self) {
+        loop {
+            let action = match &self.state {
+                States::working => self.work_handeler(),
+                States::break_time => self.break_handler(),
+            };
+            self.chang_state(action);
+        }
+    }
+    fn work_handeler(&mut self) -> Acction {
+        println!("pass");
+        Acction::goto_working
+    }
+    fn break_handler(&mut self) -> Acction {
+        println!("pass");
+        Acction::goto_working
+    }
+}
 
 fn main() {
     println!("\x1B[41mGet Ready for some INTENSE work!\x1B[0m");
-
     spaceing();
     println!("use this commad to record your work  ");
     println!("asciinema record 7-9_6pm.cast ");
