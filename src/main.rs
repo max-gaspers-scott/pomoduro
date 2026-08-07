@@ -24,18 +24,57 @@ use std::thread;
 
 use std::time::Duration;
 use std::time::{SystemTime, UNIX_EPOCH};
+// make fsa
+enum States {
+    working,    // get into and start clock
+    break_time, // get info and start break
+}
 
-fn main() {
-    println!("\x1B[41mGet Ready for some INTENSE work!\x1B[0m");
+enum Acction {
+    goto_working,
+    goto_break,
+}
 
-    spaceing();
-    println!("use this commad to record your work  ");
-    println!("asciinema record 7-9_6pm.cast ");
-    let task = get_input("what are you going to work on");
+struct Window {
+    state: States,
+}
 
-    write("task", &task);
+impl Window {
+    fn new() -> Window {
+        Window {
+            state: States::working,
+        }
+    }
+    // working can go to working for break
+    // break can only go to working
+    fn chang_state(&mut self, acction: Acction) {
+        match (&self.state, acction) {
+            (States::working, Acction::goto_working) => {
+                self.state = States::working;
+            }
+            (States::working, Acction::goto_break) => {
+                self.state = States::break_time;
+            }
+            (States::break_time, _) => self.state = States::working,
+        }
+    }
+    fn run(&mut self) {
+        loop {
+            let action = match &self.state {
+                States::working => self.work_handeler(),
+                States::break_time => self.break_handler(),
+            };
+            self.chang_state(action);
+        }
+    }
+    fn work_handeler(&mut self) -> Acction {
+        spaceing();
+        println!("use this commad to record your work  ");
+        println!("asciinema record 7-9_6pm.cast ");
+        let task = get_input("what are you going to work on");
 
-    loop {
+        write("task", &task);
+
         println!("how may munuts do you want to work");
         let mut minuts = String::new();
         match std::io::stdin().read_line(&mut minuts) {
@@ -146,9 +185,22 @@ fn main() {
         print!("{}", is_continue);
         if is_continue.trim() == "N" {
             println!("stoping");
-            return;
+            return Acction::goto_break;
         }
+
+        Acction::goto_working
     }
+    fn break_handler(&mut self) -> Acction {
+        //TODO: make a timer method and reuse method in work and break so break can have a timer
+        println!("wait as log as you need, then you can start a new work session bellow");
+        Acction::goto_break
+    }
+}
+
+fn main() {
+    println!("\x1B[41mGet Ready for some INTENSE work!\x1B[0m");
+    let mut app = Window::new();
+    app.run();
 }
 
 fn get_input(msg: &str) -> String {
