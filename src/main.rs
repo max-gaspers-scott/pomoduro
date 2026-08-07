@@ -40,6 +40,11 @@ struct Window {
 }
 
 impl Window {
+    fn new() -> Window {
+        Window {
+            state: States::working,
+        }
+    }
     // working can go to working for break
     // break can only go to working
     fn chang_state(&mut self, acction: Acction) {
@@ -63,25 +68,13 @@ impl Window {
         }
     }
     fn work_handeler(&mut self) -> Acction {
-        println!("pass");
-        Acction::goto_working
-    }
-    fn break_handler(&mut self) -> Acction {
-        println!("pass");
-        Acction::goto_working
-    }
-}
+        spaceing();
+        println!("use this commad to record your work  ");
+        println!("asciinema record 7-9_6pm.cast ");
+        let task = get_input("what are you going to work on");
 
-fn main() {
-    println!("\x1B[41mGet Ready for some INTENSE work!\x1B[0m");
-    spaceing();
-    println!("use this commad to record your work  ");
-    println!("asciinema record 7-9_6pm.cast ");
-    let task = get_input("what are you going to work on");
+        write("task", &task);
 
-    write("task", &task);
-
-    loop {
         println!("how may munuts do you want to work");
         let mut minuts = String::new();
         match std::io::stdin().read_line(&mut minuts) {
@@ -192,9 +185,22 @@ fn main() {
         print!("{}", is_continue);
         if is_continue.trim() == "N" {
             println!("stoping");
-            return;
+            return Acction::goto_break;
         }
+
+        Acction::goto_working
     }
+    fn break_handler(&mut self) -> Acction {
+        //TODO: make a timer method and reuse method in work and break so break can have a timer
+        println!("wait as log as you need, then you can start a new work session bellow");
+        Acction::goto_break
+    }
+}
+
+fn main() {
+    println!("\x1B[41mGet Ready for some INTENSE work!\x1B[0m");
+    let mut app = Window::new();
+    app.run();
 }
 
 fn get_input(msg: &str) -> String {
