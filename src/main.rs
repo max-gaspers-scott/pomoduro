@@ -24,6 +24,9 @@ use std::thread;
 
 use std::time::Duration;
 use std::time::{SystemTime, UNIX_EPOCH};
+
+static SCREAM_MP3: &[u8] = include_bytes!("scream.mp3");
+
 // make fsa
 enum States {
     working,    // get into and start clock
@@ -153,8 +156,7 @@ impl Window {
                     .expect("open default audio stream");
                 let player = rodio::Player::connect_new(&handle.mixer());
                 // Load a sound from a file, using a path relative to Cargo.toml }
-                let file = File::open("bell.mp3").unwrap();
-                // Decode that sound file into a source
+                let file = SCREAM_MP3; // Decode that sound file into a source
                 let source = Decoder::try_from(file).unwrap();
                 // Play the sound directly on the device
                 handle.mixer().add(source);
