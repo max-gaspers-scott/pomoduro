@@ -13,7 +13,7 @@ use std::path::PathBuf;
 use std::char::CharTryFromError;
 use std::ffi::os_str::Display;
 use std::fs::OpenOptions;
-use std::io::Write;
+use std::io::{Cursor, Write};
 use time::OffsetDateTime; // Make sure to bring in format_description
 
 use std::fmt::format;
@@ -25,7 +25,7 @@ use std::thread;
 use std::time::Duration;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-static SCREAM_MP3: &[u8] = include_bytes!("scream.mp3");
+static SCREAM_MP3: &[u8] = include_bytes!("../scream.mp3");
 
 // make fsa
 enum States {
@@ -156,7 +156,7 @@ impl Window {
                     .expect("open default audio stream");
                 let player = rodio::Player::connect_new(&handle.mixer());
                 // Load a sound from a file, using a path relative to Cargo.toml }
-                let file = SCREAM_MP3; // Decode that sound file into a source
+                let file = Cursor::new(SCREAM_MP3);
                 let source = Decoder::try_from(file).unwrap();
                 // Play the sound directly on the device
                 handle.mixer().add(source);
