@@ -172,7 +172,7 @@ impl Window {
             if seconts_left % 60 * 5 == 0 && seconts_left != 0 {
                 let mut handle = rodio::DeviceSinkBuilder::open_default_sink()
                     .expect("open default audio stream");
-                let file = File::open("scream.mp3").unwrap();
+                let file = Cursor::new(SCREAM_MP3);
                 let source = Decoder::try_from(file).unwrap();
                 handle.log_on_drop(false);
                 handle.mixer().add(source);
