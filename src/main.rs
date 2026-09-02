@@ -33,7 +33,7 @@ enum States {
     break_time, // get info and start break
 }
 
-enum Acction {
+enum Action {
     goto_working,
     goto_break,
 }
@@ -50,12 +50,12 @@ impl Window {
     }
     // working can go to working for break
     // break can only go to working
-    fn chang_state(&mut self, acction: Acction) {
-        match (&self.state, acction) {
-            (States::working, Acction::goto_working) => {
+    fn chang_state(&mut self, action: Action) {
+        match (&self.state, action) {
+            (States::working, Action::goto_working) => {
                 self.state = States::working;
             }
-            (States::working, Acction::goto_break) => {
+            (States::working, Action::goto_break) => {
                 self.state = States::break_time;
             }
             (States::break_time, _) => self.state = States::working,
@@ -70,24 +70,24 @@ impl Window {
             self.chang_state(action);
         }
     }
-    fn work_handeler(&mut self) -> Acction {
+    fn work_handeler(&mut self) -> Action {
         spaceing();
-        println!("use this commad to record your work  ");
+        println!("use this command to record your work  ");
         println!("asciinema record 7-9_6pm.cast ");
         let task = get_input("what are you going to work on");
 
         write("task", &task);
 
-        println!("how may munuts do you want to work");
-        let mut minuts = String::new();
-        match std::io::stdin().read_line(&mut minuts) {
+        println!("how may minutes do you want to work");
+        let mut minutes = String::new();
+        match std::io::stdin().read_line(&mut minutes) {
             Ok(_) => {}
             Err(e) => {
                 println!("error: {e}")
             }
         }
 
-        let seconts = minuts
+        let seconds = minutes
             .trim()
             .parse::<i32>()
             .expect("that was not a valid u64 number")
@@ -119,19 +119,19 @@ impl Window {
                 .try_into()
                 .unwrap();
 
-            let seconts_left = seconts - duration;
-            let display_minuts = seconts_left / 60;
-            let display_seconts = seconts_left % 60;
-            // print!("minuts: ");
-            // print_color(&to_binary_str(display_minuts));
-            // print!(", seconts: ");
-            // print_color(&to_binary_str(display_seconts));
+            let seconds_left = seconds - duration;
+            let display_minutes = seconds_left / 60;
+            let display_seconds = seconds_left % 60;
+            // print!("minutes: ");
+            // print_color(&to_binary_str(display_minutes));
+            // print!(", seconds: ");
+            // print_color(&to_binary_str(display_seconds));
             // println!("");
             //
             println!(
-                "minuts: {}, seconts: {}",
-                to_binary_str(display_minuts),
-                to_binary_str(display_seconts)
+                "minutes: {}, seconds: {}",
+                to_binary_str(display_minutes),
+                to_binary_str(display_seconds)
             );
             // println!("                              ___________");
             println!("                                6 318 421");
@@ -139,7 +139,7 @@ impl Window {
             println!();
             match rx.recv_timeout(Duration::from_secs(1)) {
                 Ok(_) => {
-                    println!("worked for: {display_minuts}:{display_seconts}");
+                    println!("worked for: {display_minutes}:{display_seconds}");
                     break;
                 }
                 Err(std::sync::mpsc::RecvTimeoutError::Timeout) => {
@@ -147,11 +147,11 @@ impl Window {
                 }
                 Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => {
                     // The input thread disconnected/panicked, break
-                    println!("worked for: {display_minuts}:{display_seconts}");
+                    println!("worked for: {display_minutes}:{display_seconds}");
                     break;
                 }
             }
-            if seconts_left == 0 {
+            if seconds_left == 0 {
                 let handle = rodio::DeviceSinkBuilder::open_default_sink()
                     .expect("open default audio stream");
                 let player = rodio::Player::connect_new(&handle.mixer());
@@ -167,9 +167,9 @@ impl Window {
                 // so we need to keep the main thread hile it's playing.
                 std::thread::sleep(std::time::Duration::from_secs(3));
 
-                println!("worked for: {display_minuts}:{display_seconts}");
+                println!("worked for: {display_minutes}:{display_seconds}");
             }
-            if seconts_left % 60 * 5 == 0 && seconts_left != 0 {
+            if seconds_left % 60 * 5 == 0 && seconds_left != 0 {
                 let mut handle = rodio::DeviceSinkBuilder::open_default_sink()
                     .expect("open default audio stream");
                 let file = Cursor::new(SCREAM_MP3);
@@ -183,19 +183,19 @@ impl Window {
         let learn = get_input("what did you learn");
 
         write("learned", &learn);
-        let is_continue = get_input("another work sessio? N to stop, any key to continue");
+        let is_continue = get_input("another work session? N to stop, any key to continue");
         print!("{}", is_continue);
         if is_continue.trim() == "N" {
-            println!("stoping");
-            return Acction::goto_break;
+            println!("stopping");
+            return Action::goto_break;
         }
 
-        Acction::goto_working
+        Action::goto_working
     }
-    fn break_handler(&mut self) -> Acction {
+    fn break_handler(&mut self) -> Action {
         //TODO: make a timer method and reuse method in work and break so break can have a timer
-        println!("wait as log as you need, then you can start a new work session bellow");
-        Acction::goto_break
+        println!("wait as log as you need, then you can start a new work session below");
+        Action::goto_break
     }
 }
 
